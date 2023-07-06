@@ -1,0 +1,3 @@
+
+grpcurl.exe -plaintext localhost:50051 describe
+grpcurl.exe -plaintext localhost:50051 list xlx.interfaces.grpc.ProductService

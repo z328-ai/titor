@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>商品管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: antiquewhite;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: azure;
+
+        }
+
+        form {
+            margin-top: 40px;
+            margin-bottom: 20px;
+
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 150px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+
+        }
+    </style>
+</head>
+<body>
+<h1>商品管理</h1>
+
+<form id="queryForm">
+    <label for="productId">商品ID:</label>
+    <input type="text" id="productId" name="productId" required>
+    <button type="submit">查询商品数量</button>
+</form>
+<form id="queryByNameForm">
+    <label for="productName">商品Name:</label>
+    <input type="text" id="productName" name="productName" required>
+    <button type="submit">查询商品数量</button>
+</form>
+
+<form id="stockInForm">
+    <label for="stockInId">商品ID:</label>
+    <input type="text" id="stockInId" name="stockInId" required>
+    <label for="stockInQuantity">入库数量:</label>
+    <input type="number" id="stockInQuantity" name="stockInQuantity" required>
+    <button type="submit">商品入库</button>
+</form>
+
+<form id="stockOutForm">
+    <label for="stockOutId">商品ID:</label>
+    <input type="text" id="stockOutId" name="stockOutId" required>
+    <label for="stockOutQuantity">出库数量:</label>
+    <input type="number" id="stockOutQuantity" name="stockOutQuantity" required>
+    <button type="submit">商品出库</button>
+</form>
+
+<div id="result">显示商品数量</div>
+
+<script>
+    const queryForm = document.getElementById('queryForm');
+    const queryByNameForm = document.getElementById('queryByNameForm');
+
+    const stockInForm = document.getElementById('stockInForm');
+    const stockOutForm = document.getElementById('stockOutForm');
+    const resultDiv = document.getElementById('result');
+
+    queryForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const productId = document.getElementById('productId').value;
+        getProductCount(productId);
+    });
+    queryByNameForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const productName = document.getElementById('productName').value;
+        getProductCountByName(productName);
+    });
+
+    stockInForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const stockInId = document.getElementById('stockInId').value;
+        const stockInQuantity = document.getElementById('stockInQuantity').value;
+        updateProductQuantity(stockInId, stockInQuantity);
+    });
+
+    stockOutForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const stockOutId = document.getElementById('stockOutId').value;
+        const stockOutQuantity = document.getElementById('stockOutQuantity').value;
+        updateProductQuantity(stockOutId, -stockOutQuantity);
+    });
+
+    function getProductCount(productId) {
+        fetch(`http://localhost:8080/products/${productId}`)
+            .then(response => response.text())
+            .then(data => {
+                resultDiv.innerText = `商品数量为: ${data}`;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    function getProductCountByName(productName) {
+        fetch(`http://localhost:8080/products/name/${productName}`)
+            .then(response => response.text())
+            .then(data => {
+                resultDiv.innerText = `商品数量为: ${data}`;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    function updateProductQuantity(productId, quantity) {
+        fetch(`http://localhost:8080/products/${productId}/${quantity}`, { method: 'PATCH' })
+            .then(response => {
+                if (response.ok) {
+                    resultDiv.innerText = '操作成功';
+                } else {
+                    resultDiv.innerText = '操作失败';
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+</script>
+</body>
+</html>
